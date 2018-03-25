@@ -1,0 +1,17 @@
+{
+  "name": "nodeguide.ru",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "bcrypt-as-promised": "^1.1.0",
+    "bcrypt-promised": "^1.0.1",
+    "express": "^3.21.2",
+    "express-history-api-fallback": "^2.2.1",
+    "express.io": "^1.1.13",
+    "mongoose": "^5.0.11",
+    "morgan": "^1.9.0",
+    "pug": "0.1.0",
+    "sitemap": "^1.11.0"
+  }
+}

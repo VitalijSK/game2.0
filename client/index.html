@@ -1,0 +1,56 @@
+<!doctype html> 
+<html lang = "en">
+	<head>
+		<link rel="stylesheet" type="text/css" href="client/css/style.css" />
+
+	</head>
+	<body>
+		<div id = "signDiv">
+		  <div class="sign-up">ENTER</div>
+		  <form class="hidden form">
+			<input id ="signdivusername" type="text" name="name" placeholder="Username"/>
+		  <button id = "entername" class="hidden"><span class="text">PLAY</span></button>
+			</form>
+		</div>
+		<div id="gameDiv">
+		</div>
+	
+	</body>
+	
+	<script>
+		const form = document.getElementsByTagName('form')[0];
+		form.addEventListener('submit', function(event){
+			console.log('hey');
+			event.preventDefault();
+			const login = form.elements['name'].value;
+			auth(login, function(err, resp){
+				console.log(err, resp);
+			});
+		});
+
+		function auth(login, callback){
+			const xhr = new XMLHttpRequest();
+				xhr.open('POST', '/auth', true);
+				xhr.withCredentials = true;
+				const user = {login};
+				const body = JSON.stringify(user);
+				console.log(`body = ${body}`);
+				xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+				
+				xhr.onreadystatechange = function(){
+						if(xhr.readyState !== 4){
+							return;
+						}
+						if(+xhr.status !== 200)
+						{
+							return callback(xhr, null);
+						}
+						
+						console.log(xhr.responseText);
+						const response = JSON.parse(xhr.responseText);
+						callback(null, response);
+				};
+				xhr.send(body);
+		}
+	</script>
+</html>
