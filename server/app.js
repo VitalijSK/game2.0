@@ -8,12 +8,14 @@ const config = require('../config/index');
 const app = express();
 const errorHandler = require('../middlewares/errorHandler');
 
+
 mongoose.Promise = bluebird;
 mongoose.connect(config.database, err =>{
   if(err)
   {
     throw err;
   }
+  
   console.log('Mongo connected');
 })
 
@@ -22,7 +24,7 @@ app.listen(config.port, err =>{
   console.log(`Server listenin on port ${config.port}`);
 });
 
-app.use(morgan('combined'));
+app.use(morgan('tiny'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(session({
@@ -31,6 +33,8 @@ app.use(session({
   secret: config.secret
 }));
 
+require('../routes/main')(app);
 require('../routes/route')(app);
+require('../routes/user')(app);
 
 app.use(errorHandler);

@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const config = require('../config/index');
 
 module.exports.signup = async (req, res, next)=>{
     const credentials = req.body;
@@ -37,6 +39,8 @@ module.exports.signin = async (req, res, next)=>{
     }
 
     req.session.userId = user._id;
-    res.json(user);
+    const token = jwt.sign({_id:user._id}, config.secret);
+    res.json(token);
 }
+
 
