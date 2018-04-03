@@ -1,34 +1,44 @@
 <!doctype html> 
 <html lang = "en">
 	<head>
-		<link rel="stylesheet" type="text/css" href="./client/css/style.css" />
+		<link rel="stylesheet" type="text/css" href="/css/style.css" />
 
 		<title>Game</title>
 	</head>
 	<body>
 		<main>
-		  	<div id="registr" class="sign-up"><p>Register</p>
-				<form id="formRegistr" class="hidden form">
-					<input  type="text" name="name" placeholder="Username"/>
-					<input  type="text" name="password" placeholder="passowrd"/>
-					<button class="hidden"><span class="text">sign-up</span></button>
-				</form>
-			</div>
-			<div id="auth" class="sign-up"><p>Auth</p>
-				<form id="formAuth" class="hidden form">
-					<input  type="text" name="name" placeholder="Username"/>
-					<input  type="text" name="password" placeholder="passowrd"/>
-					<button class="hidden"><span class="text">sign-in</span></button>
-				</form>
-			</div>
-			<div id="game" class="sign-up"><p>Game</p>
-				<button class="hidden"><span class="text">Start</span></button>
-				<div id="fieldGame">
-
+			<section>
+				<div class="container">
+					<div class="main">
+						<button id="singup">Sign-up</button>
+						<button id="singin">Sign-in</button>
+					</div>
+					<div id="registr"  class="block"><p>Register</p>
+						<form id="formRegistr" class="hidden form">
+							<input  type="text" name="name" placeholder="Username"/>
+							<input  type="text" name="password" placeholder="passowrd"/>
+							<button class="hidden"><span class="text">sign-up</span></button>
+						</form>
+					</div>
+					<div id="auth" class="block"><p>Auth</p>
+						<form id="formAuth" class="hidden form">
+							<input  type="text" name="name" placeholder="Username"/>
+							<input  type="text" name="password" placeholder="passowrd"/>
+							<button class="hidden"><span class="text">sign-in</span></button>
+						</form>
+					</div>
+					<div id="game" hidden class="game"><p>Game</p>
+						<div id="gameDiv">
+							
+						</div>
+					</div>
 				</div>
-			</div>
+			</section>
 		</main>	
 	</body>
-	<script src="./client/js/main.js"></script>
-	<script src="./client/lib/jquery-3.3.1.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+	<script src="/lib/phaser.js"></script>
+	<script src="/js/colide.js"></script>
+	<script src="/js/main.js"></script>
+	<script src="/lib/jquery-3.3.1.min.js"></script>
 </html>
