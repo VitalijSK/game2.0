@@ -277,10 +277,10 @@ mongoose.connect(config.database, err =>{
   
   console.log('Mongo connected');
 })
-
-http.listen(config.port, err =>{
+const port = process.env.PORT || config.port;
+http.listen(port, err =>{
   if(err) throw err;
-  console.log(`Server listenin on port ${config.port}`);
+  console.log(`Server listenin on port ${port}`);
 });
 
 
