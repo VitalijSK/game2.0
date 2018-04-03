@@ -269,7 +269,10 @@ io.sockets.on('connection', function(socket){
 
 
 mongoose.Promise = bluebird;
-mongoose.connect(config.database, err =>{
+const mongoUri = process.env.MONGOLAB_URI || 
+  process.env.MONGOHQ_URL || 
+  config.database;
+mongoose.connect(mongoUri, err =>{
   if(err)
   {
     throw err;
