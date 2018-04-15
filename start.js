@@ -4,13 +4,13 @@ const session = require('express-session');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const bluebird = require('bluebird');
-const config = require('./config/index');
+const config = require('config/index');
 const path = require('path');
 const app = express();
 const http = require('http').Server(app);
-const errorHandler = require('./middlewares/errorHandler');
+const errorHandler = require('middlewares/errorHandler');
 var p2 = require('p2'); 
-var physicsPlayer = require('./server/physics/playermovement.js');
+var physicsPlayer = require('server/physics/playermovement.js');
 
 
 var player_lst = [];
@@ -323,9 +323,9 @@ app.use(session({
   saveUninitialized: true,
   secret: config.secret
 }));
-app.use(express.static(path.join('./client')));
-require('./routes/main')(app);
-require('./routes/route')(app);
-require('./routes/user')(app);
+app.use(express.static(path.join('client')));
+require('routes/main')(app);
+require('routes/route')(app);
+require('routes/user')(app);
 
 app.use(errorHandler);
