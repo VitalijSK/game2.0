@@ -16,5 +16,6 @@
     "pug": "0.1.0",
     "sitemap": "^1.11.0",
     "socket.io": "^2.1.0"
-  }
+  },
+  "main": "start.js"
 }
