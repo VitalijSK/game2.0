@@ -148,7 +148,7 @@ function startGame(login){
      gameProperties.in_game = true;
      // send the server our initial position and tell it we are connected
      console.log("player"); 
-     socket.emit('new_player', {x: 0, y: 0});
+     socket.emit('new_player', {x: player.position.x, y: player.position.y});
  }
  
  // When the server notifies us of client disconnection, we find the disconnected
@@ -167,21 +167,37 @@ function startGame(login){
  var player;
  function createPlayer () {
    // The player and its settings
-   player = game.add.sprite(32, game.world.height - 150, 'dude');
+   /*player = game.add.sprite(32, 32, 'dude');
     
-   //  We need to enable physics on the player
-   game.physics.arcade.enable(player);
+   game.physics.enable(player, Phaser.Physics.ARCADE);
 
-   //  Player physics properties. Give the little guy a slight bounce.
    player.body.bounce.y = 0.2;
-   player.body.gravity.y = 300;
    player.body.collideWorldBounds = true;
+   player.body.setSize(20, 32, 5, 16);
+   player.body.gravity.y = 300;
+
+   
+   //  Our two animations, walking left and right.
+    player.animations.add('left', [0, 1, 2, 3], 10, true);
+    player.animations.add('right', [5, 6, 7, 8], 10, true);
+    game.camera.follow(player);
+*/
+   player = game.add.sprite(42, 51, 'knight');
+    
+   game.physics.enable(player, Phaser.Physics.ARCADE);
+
+   player.body.bounce.y = 0.2;
+   player.body.collideWorldBounds = true;
+   player.body.setSize(20, 32, 5, 16);
+   player.body.gravity.y = 300;
+
 
    //  Our two animations, walking left and right.
-   player.animations.add('left', [0, 1, 2, 3], 10, true);
-   player.animations.add('right', [5, 6, 7, 8], 10, true);
-
-
+    player.animations.add('run', [40,41,42,43,44,45,46,47,48,49], 10, true);
+    player.animations.add('jump_attack', [30,31,32,33,34,35,36,37,38,39], 20, false);
+    player.animations.add('attack', [0,1,2,3,4,5,6,7,8,9], 40, false);
+    player.animations.add('stay', [10,11,12,13,14,15,16,17,18,19], 10, true);
+    game.camera.follow(player);
 
  }
  function checkOverlap(spriteA, spriteB) {
@@ -203,7 +219,7 @@ function startGame(login){
      this.id = id;
      this.angle = start_angle;
      
-     this.player = game.add.sprite(32, game.world.height - 150, 'dude');
+    /* this.player = game.add.sprite(38, game.world.height - 150, 'dude');
     
      //  We need to enable physics on the player
      game.physics.arcade.enable(this.player);
@@ -217,12 +233,32 @@ function startGame(login){
      this.player.animations.add('left', [0, 1, 2, 3], 10, true);
      this.player.animations.add('right', [5, 6, 7, 8], 10, true);
      this.player.mass = 20;
+     */
+
+    
+  
+    this.player = game.add.sprite(42, 51, 'knight');
+    game.physics.arcade.enable(this.player);
+    game.physics.enable(this.player, Phaser.Physics.ARCADE);
+ 
+    this.player.body.bounce.y = 0.2;
+    this.player.body.collideWorldBounds = true;
+    this.player.body.setSize(20, 32, 5, 16);
+    this.player.body.gravity.y = 300;
+ 
+ 
+    //  Our two animations, walking left and right.
+    this.player.animations.add('run', [40,41,42,43,44,45,46,47,48,49], 10, true);
+    this.player.animations.add('jump_attack', [30,31,32,33,34,35,36,37,38,39], 20, false);
+    this.player.animations.add('attack', [0,1,2,3,4,5,6,7,8,9], 40, false);
+    this.player.animations.add('stay', [10,11,12,13,14,15,16,17,18,19], 10, true);
  }
  
  //Server will tell us when a new enemy player connects to the server.
  //We create a new enemy in our game.
  function onNewPlayer (data) {
      //enemy object 
+     console.log(data);
      var new_enemy = new remote_player(data.id, data.x, data.y, data.angle); 
      enemies.push(new_enemy);
  }
@@ -244,8 +280,8 @@ function startGame(login){
          worldX: data.worldx,
          worldY: data.worldy, 
      }
-     movePlayer.player.position.x = data.worldx;
-     movePlayer.player.position.y = data.worldy;
+     movePlayer.player.position.x = data.worldx-23;
+     movePlayer.player.position.y = data.worldy-23;
      if(data.event === 'left')
      {
         movePlayer.player.animations.play('left');
@@ -256,17 +292,20 @@ function startGame(login){
      }
      else 
      {    
-        movePlayer.player.animations.stop();
-        movePlayer.player.frame = 4;
+        movePlayer.player.animations.play('stay');
      }
      
  }
- 
+ function killPlayer(id)
+ {
+    enemies.splice(enemies.indexOf(findplayerbyid(id)), 1);
+ }
  //we're receiving the calculated position from the server and changing the player position
  function onInputRecieved (data) {
      if(data.allow)
         player.body.velocity.y = data.y;
      player.body.velocity.x = data.x;
+
  }
  
  //This is where we use the socket id. 
@@ -278,33 +317,46 @@ function startGame(login){
          }
      }
  }
+ let map, layer, bg, allow = false;
  var platform, cursors;
  main.prototype = {
      preload: function() {
+        game.load.tilemap('level1', '/assets/mapsprites/level1.json', null, Phaser.Tilemap.TILED_JSON);
         game.load.image('sky', '/assets/sky.png');
         game.load.image('ground', '/assets/platform.png');
         game.load.image('star', '/assets/star.png');
+        game.load.image('background', '/assets/background/background2.png');
         game.load.image('bomb', '/assets/bomb.png');
-        game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+        game.load.spritesheet('dude', 'assets/dude.png', 32,48);
+        game.load.spritesheet('knight', 'assets/persons/knight2.png', 42,51);
+
+        game.load.image('tiles-1', '/assets/tiles-1.png');
          // physics start system
          //game.physics.p2.setImpactEvents(true);
  
      },
-     
+    
      create: function () {
         
-        game.add.image(400, 300, 'sky');
         game.physics.startSystem(Phaser.Physics.ARCADE);
-        game.add.sprite(0, 0, 'sky');
-        platforms = game.add.group();
-        platforms.enableBody = true;
-        var ground = platforms.create(0, game.world.height - 64, 'ground');
-        ground.scale.setTo(2, 2);
-        ground.body.immovable = true;
-        var ledge = platforms.create(400, 400, 'ground');
-        ledge.body.immovable = true;
-        ledge = platforms.create(-150, 250, 'ground');
-        ledge.body.immovable = true;
+
+        game.stage.backgroundColor = '#000000';
+    
+        bg = game.add.tileSprite(0, 0, 800, 600, 'background');
+        bg.fixedToCamera = true;
+    
+        map = game.add.tilemap('level1');
+    
+        map.addTilesetImage('tiles-1');
+    
+        map.setCollisionByExclusion([ 13, 14, 15, 16, 46, 47, 48, 49, 50, 51 ]);
+    
+        layer = map.createLayer('Tile Layer 1');
+    
+        //  Un-comment this on to see the collision tiles
+        // layer.debug = true;
+    
+        layer.resizeWorld();
         
         console.log("client started");
         //socket.on("connect", onsocketConnected); 
@@ -323,20 +375,32 @@ function startGame(login){
         socket.on('killed', onKilled);
        
         cursors = game.input.keyboard.createCursorKeys();
-       
+        attack = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        attack.onDown.add(attackHeroy, this);
+        game.input.keyboard.removeKeyCapture(game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR));
      },
      
      update: function () {
-
- 
+        var hitPlatform = game.physics.arcade.collide(player, layer);
+        let abulity = '';
+       
         player.body.collideWorldBounds = true;
-        var hitPlatform = game.physics.arcade.collide(player, platforms);
         for (var i = 0; i < enemies.length; i++) {
-            game.physics.arcade.collide(enemies[i].player, platforms);
-            game.physics.arcade.collide(enemies[i].player, player);
+            game.physics.arcade.collide(enemies[i].player, layer);
             
             if (checkOverlap(player, enemies[i].player))
             {
+                if(abulity !== '')
+                {
+                    socket.emit('cross', {
+                        player1_x: enemies[i].player.position.x, 
+                        player1_y: enemies[i].player.position.y,
+                        player2_x: player.position.x, 
+                        player2_y: player.position.y,
+                        abulity: abulity,
+                    });
+                }
+                
                 console.log('Drag the sprites. Overlapping: true');
             }
             else
@@ -349,53 +413,74 @@ function startGame(login){
         let event = '';
     if (cursors.left.isDown)
     {
-        //  Move to the left
-        //player.body.velocity.x = -150;
-        event = 'left';
-        player.animations.play('left');
+        serverEmit('left');
+        player.scale.x = -1; 
+        player.anchor.setTo(0.5);
+        player.animations.play('run');
+        
     }
     else if (cursors.right.isDown)
     {
-        event = 'right'
-       // player.body.velocity.x = 150;
-        player.animations.play('right');
+        serverEmit('right');
+        player.scale.x = 1; 
+        player.anchor.setTo(0.5);
+        player.animations.play('run');
+    }
+    else if (cursors.up.isDown && player.body.onFloor() && hitPlatform)
+    {
+        serverEmit('jump');
+    }
+    else if(allow)
+    {
+
     }
     else
     {
-        //  Stand still
-       
-            event = 'stop';
+        serverEmit('stop');
+        player.animations.play('stay');
+    }
     
-        
-        player.animations.stop();
-        player.frame = 4;
-    }
-    if (event !== '')
-   {    
-        socket.emit('input_fired', {
-            pointer_x: player.body.velocity.x, 
-            pointer_y: player.body.velocity.y, 
-            world_x: player.position.x, 
-            world_y: player.position.y,
-            event: event,
-        });
-   }
-   
-    if (cursors.up.isDown && player.body.touching.down && hitPlatform)
-    {
-        socket.emit('input_fired', {
-            pointer_x: player.body.velocity.x, 
-            pointer_y: player.body.velocity.y, 
-            world_x: player.position.x, 
-            world_y: player.position.y,
-            event: 'jump',
-        });
-        //player.body.velocity.y = -350;
-    }
-    //  Allow the player to jump if they are touching the ground.
+   game.input.enabled = true;
+  
      }
  }
- 
+ function serverEmit(event)
+ {
+    socket.emit('input_fired', {
+        pointer_x: player.body.velocity.x, 
+        pointer_y: player.body.velocity.y, 
+        world_x: player.position.x, 
+        world_y: player.position.y,
+        event: event,
+    });
+ }
+ function attackHeroy()
+ {
+    allow = true;
+    let time = 0;
+    if(!player.body.onFloor())
+    {
+        time = 700;
+        player.animations.play('jump_attack');
+    }
+    else 
+    {
+        time = 350;
+        player.animations.play('attack');
+    }
+    setTimeout(function(){
+        allow = false;
+    }, time);
+    serverEmit('attack');
+    for (var i = 0; i < enemies.length; i++) { 
+        if (checkOverlap(player, enemies[i].player))
+        {
+            socket.emit('attack', {
+                id: enemies[i].id
+            });
+        }
+    }
+ }
  var gameBootstrapper = {
      init: function(gameContainerElementId){
          game.state.add('main', main);

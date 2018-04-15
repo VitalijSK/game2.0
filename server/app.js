@@ -14,6 +14,7 @@ var physicsPlayer = require('../server/physics/playermovement.js');
 
 
 var player_lst = [];
+var attack_lst = [];
 
 //needed for physics update 
 var startTime = (new Date).getTime();
@@ -30,8 +31,14 @@ var world = new p2.World({
 var Player = function (startX, startY) {
   this.x = startX
   this.y = startY
+  this.health = 100;
   //We need to intilaize with true.
   this.sendData = true;
+}
+var Attack = function (data) {
+  this.x = data.x
+  this.y = data.y
+  this.rad = data.rad
 }
 
 //We call physics handler 60fps. The physics is calculated here. 
@@ -50,6 +57,7 @@ function physics_hanlder() {
 // when a new player connects, we make a new instance of the player object,
 // and send a new player message to the client. 
 function onNewplayer (data) {
+	console.log('---');
 	console.log(data);
 	//new player instance
 	var newPlayer = new Player(data.x, data.y);
@@ -95,8 +103,29 @@ function onNewplayer (data) {
 }
 
 
-
-
+function attackPlayer(data) {
+	var Player = find_playerid(data.id); 
+	if (!Player) {
+		return;
+		console.log('no player'); 
+	}
+	console.log(Player);
+	Player.health -=50;
+	
+	if(Player.health <= 0)
+	{
+		this.broadcast.emit('remove_player', {id: data.id});
+		this.broadcast.to(data.id).emit("killed"); 
+		
+		playerKilled(Player);
+		this.emit('remove_player', {id: data.id}); 
+		player_lst.splice(player_lst.indexOf(Player), 1);
+		
+	}
+}
+function playerKilled (player) {
+	player.dead = true; 
+}
 //instead of listening to player positions, we listen to user inputs 
 let allow = false;
 function onInputFired (data) {
@@ -145,8 +174,7 @@ function onInputFired (data) {
 		allow = true;
 	}
 	
-	console.log('info');
-	console.log(data);
+
 	
 	
 	//new player position to be sent back to client. 
@@ -261,6 +289,7 @@ io.sockets.on('connection', function(socket){
 	*/
 	//listen for new player inputs. 
 	socket.on("input_fired", onInputFired);
+	socket.on("attack", attackPlayer);
 
 	socket.on("player_collision", onPlayerCollision);
 });
