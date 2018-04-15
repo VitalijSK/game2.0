@@ -298,7 +298,7 @@ io.sockets.on('connection', function(socket){
 
 mongoose.Promise = bluebird;
 const mongoUri = process.env.MONGOLAB_URI || 
-  process.env.MONGOHQ_URL || process.env.MONGODB_URI
+  process.env.MONGOHQ_URL || process.env.MONGOLAB_ROSE_URI
       config.database;
 mongoose.connect(mongoUri, err =>{
   if(err)
