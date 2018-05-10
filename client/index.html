@@ -2,7 +2,7 @@
 <html lang = "en">
 	<head>
 		<link rel="stylesheet" type="text/css" href="/css/style.css" />
-
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Game</title>
 	</head>
 	<body>
@@ -29,8 +29,60 @@
 					</div>
 					<div id="game" hidden class="game"><p>Game</p>
 						<div id="gameDiv">
-							
+							<div class="fon">
+								<div class="button">
+								<a class="border-animation" href="#">
+									<div class="border-animation__inner">Start</div></a>
+								</div>
+							</div>
+							<div class="menu_pause">
+								<div class="menu_for_pause">
+									<div class="button back_menu">
+										<a class="border-animation" href="#">
+										<div class="border-animation__inner">Menu</div></a>
+									</div>
+									<div class="button play">
+										<a class="border-animation" href="#">
+										<div class="border-animation__inner">Play</div></a>
+									</div>
+								</div>
+							</div>
+							<div class="menu">
+								<div class="butt">
+									<div class="level1">
+										<div class="button">
+											<a class="border-animation" href="#">
+											<div class="border-animation__inner">level-1</div></a>
+										</div>
+									</div>
+									<div class="level2">
+										<div class="button">
+											<a class="border-animation" href="#">
+											<div class="border-animation__inner">level-2</div></a>
+										</div>
+									</div>
+									<div class="level3">
+										<div class="button">
+											<a class="border-animation" href="#">
+											<div class="border-animation__inner">level-3</div></a>
+										</div>
+									</div>
+								</div>
+								<div class="button shop">
+										<a class="border-animation" href="#">
+										<div class="border-animation__inner">Shop</div></a>
+								</div>
+							</div>
+
+							<div class="shop_menu">
+								<div><p>Your Coins: <span class="coins"></span></p></div>
+								<div class="butt">
+									
+								</div>
+								
+							</div>
 						</div>
+						
 					</div>
 				</div>
 			</section>
@@ -39,6 +91,20 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
 	<script src="/lib/phaser.js"></script>
 	<script src="/js/colide.js"></script>
+	<script src="/js/robot.js"></script>
+	<script src="/js/ninja.js"></script>
+	<script src="/js/knight.js"></script>
+	<script src="/js/remote_player.js"></script>
+	<script src="/js/zoobie.js"></script>
+	<script src="/js/states/boot.js"></script>
+	<script src="/js/states/preload.js"></script>
+	<script src="/js/states/menu.js"></script>
+	<script src="/js/states/shop.js"></script>
+	<script src="/js/states/game.js"></script>
+	<script src="/js/states/level1.js"></script>
+	<script src="/js/states/level2.js"></script>
+	<script src="/js/states/level3.js"></script>
+	<script src="/js/states/gameover.js"></script>
 	<script src="/js/main.js"></script>
 	<script src="/lib/jquery-3.3.1.min.js"></script>
 </html>

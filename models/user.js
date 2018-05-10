@@ -8,7 +8,15 @@ const UserSchema = new mongoose.Schema({
         index: true,
         unique: true
     },
-    password: String
+    password: String,
+    coins: { 
+        type: Number,
+        default: 6000 
+        },
+    currectPerson:{ 
+        type: String,
+        default: 'robot' 
+        }
 });
 
 UserSchema.pre('save', async function(next){

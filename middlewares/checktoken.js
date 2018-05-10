@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/index');
 module.exports = async (req, res, next)=>{
     const token = req.headers['authorization'];
+    const good = req.headers['good'];
     
     if(!token){
         return next({
@@ -21,5 +22,6 @@ module.exports = async (req, res, next)=>{
     }
 
     req.token = tokenObj;
+    req.good = good;
     next();
 };

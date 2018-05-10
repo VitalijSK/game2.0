@@ -15,6 +15,9 @@ body{
 .game{
   padding-top:20vh;
 }
+.formmod {
+  background-color:rgba(0, 0, 0, 0.52)!important;
+}
 canvas{
   position: absolute;
   left: 0;
@@ -108,4 +111,426 @@ form button{
   -moz-transition: right 1.3s 0.1s ease;
   -o-transition: right 1.3s 0.1s ease;
   -webkit-transition: right 1.3s 0.1s ease;
+}
+.button
+{
+  width: 320px;
+  margin: 0 auto;
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  right: 0;
+  top: 228px;
+}
+.border-animation {
+  --border-width: 0.1em;
+  --animation-speed: 0.5s;
+  --color: #ffffff;
+  color: var(--color);
+  display: inline-block;
+  font-size: 4em;
+  line-height: 1em;
+  transform: scale(1, 0.8);
+  border: var(--border-width) solid transparent;
+}
+  .border-animation__inner {
+    position: relative;
+    display: inline-block;
+    width: 85%;
+    font-family: 'Six Caps', sans-serif;
+    font-weight: 300;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    padding: 0.2em;
+    background-color: #000;
+    z-index: 1;
+    border: solid var(--border-width) transparent;
+  }
+  
+  .border-animation:before,
+  .border-animation:after {
+    content: '';
+    position: absolute;
+    background: var(--color);
+  }
+  
+  .border-animation:focus:before,
+  .border-animation:hover:before {
+    animation: beforeBorders var(--animation-speed) forwards ease-in-out;
+  }
+
+  .border-animation:focus:after,
+  .border-animation:hover:after {
+    animation: afterBorders var(--animation-speed) forwards ease-in-out;
+  }
+  
+  .border-animation:focus,
+  .border-animation:hover {
+    animation: borderColors var(--animation-speed) steps(1) forwards;
+    outline: none;
+  }
+    .border-animation__inner {
+      animation: background calc(var(--animation-speed) / 5 * 3) forwards ease-in-out;
+      animation-delay: calc(var(--animation-speed) / 5 * 2);
+    }
+
+@keyframes beforeBorders {
+  0% {
+    top: calc(var(--border-width) * -1);
+    left: 50%;
+    bottom: auto;
+    right: auto;
+    width: 0;
+    height: var(--border-width);
+  }
+  33% {    
+    top: calc(var(--border-width) * -1);
+    left: calc(var(--border-width) * -1);
+    bottom: auto;
+    right: auto;
+    width: calc(var(--border-width) + 50%);
+    height: var(--border-width);
+  }
+  66% {
+    top: calc(var(--border-width) * -1);
+    left: calc(var(--border-width) * -1);
+    bottom: auto;
+    right: auto;
+    width: var(--border-width);
+    height: calc((var(--border-width) * 2) + 100%);
+  }
+  100% {
+    top: auto;
+    left: calc(var(--border-width) * -1);
+    bottom: calc(var(--border-width) * -1);
+    right: auto;
+    width: calc(var(--border-width) + 50%);
+    height: calc((var(--border-width) * 2) + 100%);
+  }
+}
+
+@keyframes afterBorders {
+  0% {
+    top: calc(var(--border-width) * -1);
+    left: auto;
+    bottom: auto;
+    right: 50%;
+    width: 0;
+    height: var(--border-width);
+  }
+  33% {    
+    top: calc(var(--border-width) * -1);
+    left: auto;
+    bottom: auto;
+    right: calc(var(--border-width) * -1);
+    width: calc(var(--border-width) + 50%);
+    height: var(--border-width);
+  }
+  66% {
+    top: calc(var(--border-width) * -1);
+    left: auto;
+    bottom: auto;
+    right: calc(var(--border-width) * -1);
+    width: var(--border-width);
+    height: calc((var(--border-width) * 2) + 100%);
+  }
+  100% {
+    top: auto;
+    left: auto;
+    bottom: calc(var(--border-width) * -1);
+    right: calc(var(--border-width) * -1);
+    width: calc(var(--border-width) + 50%);
+    height: calc((var(--border-width) * 2) + 100%);
+  }
+}
+
+@keyframes borderColors {
+  0% {
+    border-top-color: transparent;
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+  }
+  33% {
+    border-top-color: var(--color);
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+
+  }
+  66% {
+    border-top-color: var(--color);
+    border-right-color: var(--color);
+    border-bottom-color: transparent;
+    border-left-color: var(--color);
+  }
+  100% {
+    border-top-color: var(--color);
+    border-right-color: var(--color);
+    border-bottom-color: var(--color);
+    border-left-color: var(--color);
+  }
+}
+
+@keyframes background {
+  to {
+    background-color: #000;
+    text-shadow: 0 0.1em 0.1em #111;
+  }
+}
+
+@media (min-width: 850px) {
+  body {
+    justify-content: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .border-animation {
+    font-size: 58pt;
+    line-height: 1em;    
+  }
+}
+.fon{
+  display:none;
+  opacity: 0;
+  background-image: url(../img/boot.jpg);
+  width: 800px;
+  height: 600px;
+  border: 20px solid #000;
+  border-radius: 20px;
+  left: 0;
+  margin: 0 auto;
+  top: 50px;
+  right: 0;
+  position: absolute;
+  z-index: 1;
+  -moz-transition: opacity 0.3s 0.1s ease;
+  -o-transition: opacity 0.3s 0.1s ease;
+  -webkit-transition: opacity 0.3s 0.1s ease;
+}
+.menu{
+  display:none;
+  background-image: url(../img/levels.jpg);
+  width: 800px;
+  height: 600px;
+  border: 20px solid #000;
+  border-radius: 20px;
+  left: 0;
+  margin: 0 auto;
+  top: 50px;
+  right: 0;
+  position: absolute;
+  z-index: 1;
+  -moz-transition: opacity 0.3s 0.1s ease;
+  -o-transition: opacity 0.3s 0.1s ease;
+  -webkit-transition: opacity 0.3s 0.1s ease;
+}
+.shop_menu{
+  display:none;
+  background-image: url(../img/levels.jpg);
+  width: 800px;
+  height: 600px;
+  border: 20px solid #000;
+  border-radius: 20px;
+  left: 0;
+  margin: 0 auto;
+  top: 50px;
+  right: 0;
+  position: absolute;
+  z-index: 1;
+  -moz-transition: opacity 0.3s 0.1s ease;
+  -o-transition: opacity 0.3s 0.1s ease;
+  -webkit-transition: opacity 0.3s 0.1s ease;
+}
+.menu_pause{
+  display:none;
+  width: 800px;
+  height: 600px;
+  background-color: #0808084a;
+  left: 0;
+  margin: 0 auto;
+  top: 50px;
+  right: 0;
+  position: absolute;
+  z-index: 1;
+}
+.menu_for_pause
+{
+  display:block;
+  width: 400px;
+  height:300px;
+  border-radius: 10px;
+  background-color: #0000008f;
+  left: 0;
+  margin: 0 auto;
+  top: 150px;
+  right: 0;
+  position: relative;
+  z-index: 1;
+}
+.play{
+  top: 148px;
+}
+.play .border-animation{
+  width: 293px;
+}
+.back_menu{
+  top: 19px;
+}
+.level1, .level2, .level3{
+  width: 223px;
+  height: 500px;
+  margin-top: 22px;
+  background-size: cover;
+  float: left;
+}
+.person{
+  width: 171px;
+  margin-top: 37px;
+  background-size: cover;
+  float: left;
+}
+.shop_menu p {
+  font-size: 27pt;
+  margin: 0;
+  background-color: #0000004a;
+  color: #fff;
+  padding: 5px;
+  text-align: center;
+
+}
+.person .button{
+  position: relative;
+  width: 150px;
+  top: -32px;
+}
+.person .border-animation {
+  font-size: 21pt;
+  min-width: 150px;
+}
+.herou{
+  clear: both;
+    width: 250px;
+    margin: 0 auto;
+}
+.person .border-animation__inner {
+  position: relative;
+  display: inline-block;
+  width: 89%;
+  text-align: center;
+}
+.person img{
+  width: 150px;
+  padding: 14px;
+  height: 120px;
+}
+.level1{
+  background-image: url(../img/levels/level1.jpg);
+  margin-right:20px;
+}
+.level2{
+  background-image: url(../img/levels/level2.jpg);
+  margin-right:20px;
+}
+.level3{
+  background-image: url(../img/levels/level3.jpg);
+}
+.menu .butt{
+  width:720px;
+  margin: 0 auto;
+}
+.menu .button {
+  width: 230px;
+  position: relative; 
+  z-index: 1;
+}
+.menu .shop {
+  margin: 0 auto;
+  width: 169px;
+  z-index: 1;
+  position: static;
+}
+.menu .border-animation__inner {
+  width: 88%;
+}
+.shop .border-animation__inner {
+  width: 84%;
+}
+@media (min-width: 1200px)
+{
+  .menu .border-animation {
+    font-size: 33pt;
+    line-height: 1em;
+}
+  .shop .border-animation {
+    font-size: 33pt;
+    line-height: 1em;
+}
+}
+@media (max-width: 800px)
+{
+  .fon{
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    top: 0px;
+    border: none;
+  }
+  .button {
+    width: 267px;
+  }
+  .menu {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    top: 0px;
+    border: none;
+  }
+  .level1, .level2, .level3 {
+    width: 30%;
+    height: 288px;
+    margin-top: 30px;
+    background-size: cover;
+    float: left;
+  }
+  .level1 .button, .level2 .button, .level3 .button {
+    width: 100%;
+  }
+  .menu .border-animation {
+      font-size: 29pt;
+  }
+  canvas {
+    top: 0;
+  }
+  .shop_menu {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    top: 0px;
+    border: none;
+  }
+  .menu .butt {
+    width: 100vw;
+    margin: 0 auto;
+}
+}
+@media (max-width: 500px)
+{
+  .menu .butt {
+    width: 90vw;
+    margin: 0 auto;
+}
+.level1, .level2, .level3 {
+  width: 50%;
+  margin-top: 14px;
+  margin-right: 0;
+}
+.menu .shop {
+  width: 126px;
+}
+.menu .border-animation {
+  font-size: 24pt;
+}
 }
