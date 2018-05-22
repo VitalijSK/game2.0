@@ -13,6 +13,27 @@ module.exports.getUserByToken = async function(token) {
     }
     return user;
 }
+module.exports.findAll = async function(token) {
+    let user;
+    try{
+        user = await User.find({});
+    }catch(e)
+    {
+        throw e;
+    }
+    return user;
+}
+module.exports.getUserByLogin = async function(login) {
+    let user;
+    try{
+        user = await User.findOne({_id}, {password: 0});
+        console.log(user);
+    }catch(e)
+    {
+        throw e;
+    }
+    return user;
+}
 module.exports.changeSkin = async function(token, skin) {
     const {_id} = token;
     let user;
@@ -31,7 +52,6 @@ module.exports.setUserByToken = async function(token, coins, p_id) {
     let user;
     try{
         user = await User.findOne({_id}, {coins: 1}); 
-        
         if(user.coins >= coins)
         {
             user.coins -=coins;

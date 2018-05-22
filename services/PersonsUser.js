@@ -20,3 +20,13 @@ module.exports.findAll = async function(condit) {
     }
     return persons;
 }
+module.exports.findTop = async function() {
+    let persons;
+    try{    
+        persons = await PersonsUser.find({}).sort({ level: 1 }).limit(8);
+    }catch(e)
+    {
+        throw e;
+    }
+    return persons;
+}

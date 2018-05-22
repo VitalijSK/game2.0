@@ -1,6 +1,6 @@
-let game, player,map, skin, layer, bg, platform, cursors, allow = false, weapon;
+ let game, player,map, skin,collision = true, layer, bg, platform, cursors, allow = false, weapon, login;
  const enemies = [];
- const bots = [];
+ let bots = [];
  const socket = io.connect();
  let canvas_width, canvas_height;
  if(document.body.clientWidth < 750)
@@ -18,12 +18,12 @@ let game, player,map, skin, layer, bg, platform, cursors, allow = false, weapon;
     game_elemnt: "gameDiv",
     in_game: false,
 };
-function onsocketConnected () {
+function onsocketConnected (level) {
     console.log("connected to server"); 
     gameProperties.in_game = true;
     player = eval(skin);
     game.camera.follow(player);
-    socket.emit('new_player', {x: player.position.x, y: player.position.y, skin: skin});
+    socket.emit('new_player', {x: player.position.x, y: player.position.y, skin: skin, level: level});
 }
 function onRemovePlayer (data) {
     const removePlayer = findplayerbyid(data.id);
@@ -53,7 +53,9 @@ function checkOverlap(spriteA, spriteB) {
    return Phaser.Rectangle.intersects(boundsA, boundsB);
 }
 function onKilled (data) {
+   document.getElementsByClassName('kill')[0].innerHTML = data.killed;
    player.destroy();
+   socket.emit('exit', {});
    game.state.start('gameover', false, false);
 }
 
@@ -183,6 +185,7 @@ function player_coll (body, bodyB, shapeA, shapeB, equation) {
 function getSkin(res)
 {
     let str = res.currectPerson;
+    login = res.login;
     str = str.charAt(0).toUpperCase() + str.substr(1);
     const classPerson = 'new '+str+'(game)'; 
     skin = classPerson;
@@ -205,6 +208,32 @@ function getUser(fun){
         }
     });
 
+}
+function getTop(fun){
+    const token = get_cookie('token');
+    $.ajax({
+        type: 'POST',
+        url: '/api/getTop',
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("authorization", token);
+          },
+        cache: false,           
+        success: fun,
+        statusCode: {
+            400: function() {
+                messageUser( "Forbidden!" );
+            }
+        }
+    });
+
+}
+function setListTop(data)
+{
+    let result = '';
+    data.reverse().forEach((elem, i)=>{
+        result +=`${i+1}.${elem.name} - ${elem.person}(${elem.level} lvl)</br>`;
+    });
+    document.getElementsByClassName('topList')[0].innerHTML = result;
 }
 function Buy(fun, value){
     const token = get_cookie('token');
@@ -302,7 +331,6 @@ function setHTMLCollection(res)
         time = 350;
         player.animations.play('shoot');
     }
-
     setTimeout(function(){
         allow = false;
     }, time);
@@ -344,7 +372,8 @@ function setHTMLCollection(res)
         if (checkOverlap(player, enemies[i].player))
         {
             socket.emit('attack', {
-                id: enemies[i].id
+                id: enemies[i].id,
+                login:login
             });
         }
     }
@@ -352,37 +381,74 @@ function setHTMLCollection(res)
         if (checkOverlap(player, bots[i].player))
         {
             socket.emit('attack_bot', {
-                id: bots[i].id
+                id: bots[i].id,
+                login:login
             });
         }
     }
+}
+function walkBot(bot)
+{
+    //bot.player.body.velocity.x = 0;
+    if(Math.abs(bot.x - bot.player.position.x) > 100 || bot.prevX === bot.player.position.x){
+        if(bot.attack)
+        {
+
+        }
+        else if(bot.x - bot.player.position.x < 0)
+        {
+            bot.player.body.velocity.x = -50;
+            bot.player.scale.x = -1; 
+            bot.player.anchor.setTo(0.5);
+            bot.player.animations.play('run');
+        }
+        else if(bot.x - bot.player.position.x > 0)
+        {    
+            bot.player.body.velocity.x = 50;
+            bot.player.scale.x = 1; 
+            bot.player.anchor.setTo(0.5);
+            bot.player.animations.play('run');
+        }
+        else 
+        {    
+            bot.player.animations.play('stay');
+        } 
+    }
+    bot.prevX = bot.player.position.x;
+
 }
 function setCollisionAttack()
 {
     for (let i = 0; i < enemies.length; i++) { 
-        game.physics.arcade.collide(enemies[i].player , weapon.bullets, collision_handler, null, this);
-        game.physics.arcade.collide(player , enemies[i].weapon.bullets, collision_handler, null, this);
+        game.physics.arcade.overlap(player , enemies[i].weapon.bullets, collision_handler, null, this);
         if (checkOverlap(weapon.bullets, enemies[i].player))
         {
             socket.emit('attack', {
-                id: enemies[i].id
+                id: enemies[i].id,
+                login:login
             });
         }
     }
     
-    for (let i = 0; i < bots.length; i++) { 
-        game.physics.arcade.collide(bots[i].player , weapon.bullets, collision_handler, null, this);
-        if (checkOverlap(weapon.bullets, bots[i].player))
-        {         
+    for (let i = 0; i < bots.length; i++) {     
+        game.physics.arcade.overlap(bots[i].player , weapon.bullets, collision_handler, null, this); 
+        if (checkOverlap(weapon.bullets, bots[i].player) && collision)
+        {        
             socket.emit('attack_bot', {
-                id: bots[i].id
+                id: bots[i].id,
+                login:login
             });  
+            collision = false;
+            setTimeout(()=>{
+                collision = true;
+            },200);
         }
+        
     }
 }
-function enemyBullet(id)
+function enemyBullet(data)
 {
-    const enemy = findplayerbyid(id);
+    const enemy = findplayerbyid(data.id);
     enemy.weapon.trackSprite(enemy.player, 0, 0, true);
     if(enemy.player.scale.x === -1)
     {
@@ -390,7 +456,7 @@ function enemyBullet(id)
     }
     else enemy.weapon.fire();
 }
-function myBullet(id)
+function myBullet(data)
 {
     if(player.scale.x === -1)
     {
@@ -423,19 +489,22 @@ function collision_handler (object1, object2) {
 }
  function attackBot(bots)
  {
-    bots.attack = true;
-    setTimeout(function(){
-        
-        bots.attack = false;
-    }, 350);
-    bots.player.animations.play('attack');
-    socket.emit('cross_bot', {
-        id_bot: bots.id, 
-        bot_x: bots.player.position.x, 
-        bot_y: bots.player.position.y, 
-        player_x: player.position.x, 
-        player_y: player.position.y,
-    });
+    if(!bots.attack){
+        socket.emit('cross_bot', {
+            id_bot: bots.id, 
+            bot_x: bots.player.position.x, 
+            bot_y: bots.player.position.y, 
+            player_x: player.position.x, 
+            player_y: player.position.y,
+        });
+        bots.player.body.velocity.x = 0;
+        bots.attack = true;
+        bots.player.animations.play('attack');
+        setTimeout(function(){   
+            bots.attack = false;
+        }, 2000);
+    }
+    
 }
 function onPause()
 {
@@ -444,6 +513,8 @@ function onPause()
 
     document.getElementsByClassName('back_menu')[0].addEventListener('click', ()=>{
         onPlay();
+        player.destroy();
+        socket.emit('exit', {});
         game.state.start('menu', false, false);
     });
     document.getElementsByClassName('play')[0].addEventListener('click', onPlay);

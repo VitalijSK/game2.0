@@ -12,15 +12,18 @@ const errorHandler = require('../middlewares/errorHandler');
 const p2 = require('p2'); 
 const physicsPlayer = require('../server/physics/playermovement.js');
 const unique = require('node-uuid')
-const user_stat = require('../services/UserService');
+const user_stat = require('../models/user');
 const jwt = require('jsonwebtoken');
+const personManager = require('../models/personsuser');
+const personsCollection = require('../models/persons');
 
-const bots_lst = [];
 const room_List = {}
 
 function Room() {
 	this.room_id;
+	this.level;
 	this.player_lst = [];
+	this.bots_lst = [];
 	this.max_num = 2;
 }
 //needed for physics update 
@@ -71,7 +74,6 @@ const foodpickup = function (max_x, max_y, type, id) {
 
 //We call physics handler 60fps. The physics is calculated here. 
 setInterval(heartbeat, 1000/60);
-addfood(game_instance.food_num);
 
 //Steps the physics world. 
 function physics_hanlder() {
@@ -93,70 +95,41 @@ function heartbeat () {
 		let room = room_List[key];
 	}
 	//add the food 
-	
-	for (let i = 0; i < bots_lst.length; i++) {
-		if(bots_lst[i].x > 1000)
-		{
-			revers = true;
-
-		}
-		if(bots_lst[i].x < 100)
-		{
-			revers = false;
-
-		}
-		if(revers)
-		{
-			bots_lst[i].playerBody.position[0] =-50;
-			bots_lst[i].x--;
-		}
-		else
-		{
-			bots_lst[i].playerBody.position[0] = 50;
-			bots_lst[i].x++;
-		}
-		const current_info = {
-			id: bots_lst[i].id, 
-			x: bots_lst[i].playerBody.position[0],
-			y: bots_lst[i].y,
-			left: revers
-		}; 
-		io.emit("bot_move", current_info); 
-	}
-	//add the food 
 	//addfood(food_generatenum);
 	//physics stepping. We moved this into heartbeat
 	physics_hanlder();
 }
-function addfood(n) {
+function addfood(n, room_id) {
 	//return if it is not required to create food 
 	if (n <= 0) {
 		return; 
 	}
-	
 	//create n number of foods to the game
 	for (let i = 0; i < n; i++) {
-		onNewbot(game_instance.canvas_width, game_instance.canvas_height);
+		onNewbot(game_instance.canvas_width, game_instance.canvas_height, room_id);
 	}
 }
-function checkfood(player)
+function checkfood(player, room_id)
 {
+	const bots_lst = room_List[room_id].bots_lst;
 	for (let i = 0; i < bots_lst.length; i++) {
 		const current_info = {
-			id: bots_lst[i].id, 
+			id:bots_lst[i].id, 
 			x: bots_lst[i].x,
 			y: bots_lst[i].y,
 		}; 
 		player.emit("item_update", current_info); 
+		io.to(room_id).emit("bot_move", current_info); 
 	}
 }
-function find_food (id) {
+function find_food (id, room_id) {
+	if(room_List[room_id] === undefined) return;
+	const bots_lst = room_List[room_id].bots_lst;
 	for (let i = 0; i < bots_lst.length; i++) {
 		if (bots_lst[i].id == id) {
 			return bots_lst[i]; 
 		}
 	}
-	
 	return false;
 }
 
@@ -166,10 +139,19 @@ function find_food (id) {
 function onNewplayer (data) {
 	//new player instance
 	const newPlayer = new Player(data.x, data.y);
-	const room_id = find_Roomid(); 
-	const room = room_List[room_id];
+	let room_id, room;
+	if(data.level == 3)
+	{
+		room_id = find_Roomid(data.level); 
+	}
+	else{
+		room_id = create_Room(data.level);
+	}
+	
+	room = room_List[room_id];
 	//join the room; 
 	this.room_id = room_id;
+	this.killed = 0;
 	newPlayer.skin = data.skin;
 	//join the room
 	this.join(this.room_id);
@@ -210,35 +192,33 @@ function onNewplayer (data) {
 	}
 
 	this.broadcast.to(room_id).emit('new_enemyPlayer', current_info);
-	checkfood(this);
+	checkfood(this, room_id);
 	room.player_lst.push(newPlayer);
 }
 
-function find_Roomid() {
+function find_Roomid(level) {
 	for (let key in room_List) {
 		let room = room_List[key];
-		if (room.player_lst.length < room.max_num) {
-			console.log(room.max_num);
-			console.log(room.player_lst.length);
+		if (room.player_lst.length < room.max_num && room.level == level) {
 			return key;
 		}
 	}
-	
 	//did not find a room. create an extra room;
-	const room_id = create_Room();
+	const room_id = create_Room(level);
 	return room_id;
 }
-function create_Room() {
+function create_Room(level) {
 	//create new room id;
 	const new_roomid = unique.v4();
 	//create a new room object
 	const new_game = new Room();
+	new_game.level = level;
 	new_game.room_id = new_roomid;
-	
 	room_List[new_roomid] = new_game; 
+	addfood(10,new_roomid);
 	return new_roomid;
 }
-function onNewbot (max_x, max_y) {
+function onNewbot (max_x, max_y, room_id) {
 	
 	//new player instance
 	var newBot = new Bot(getRndInteger(10, max_x - 10), getRndInteger(10, max_y - 10));
@@ -253,7 +233,7 @@ function onNewbot (max_x, max_y) {
 	newBot.playerBody = playerBody;
 	world.addBody(newBot.playerBody); 	
 	//information to be sent to all clients except sender
-	bots_lst.push(newBot); 
+	room_List[room_id].bots_lst.push(newBot); 
 }
 
 function attackPlayer(data) {
@@ -262,41 +242,99 @@ function attackPlayer(data) {
 		return;
 		console.log('no player'); 
 	}
+	const room_id = this.room_id;
+	getLevel(data.login, room_id, data, 20, 50, Player, this, damage);
 	
-	Player.health -=20;
-	if(Player.health <= 0)
-	{
-		const player_lst = room_List[this.room_id].player_lst;
-		this.broadcast.to(this.room_id).emit('remove_player', {id: data.id});
-		this.broadcast.to(data.id).emit("killed"); 
-		
-		playerKilled(Player);
-		this.emit('remove_player', {id: data.id}); 
-		//player_lst.splice(player_lst.indexOf(Player), 1);
-		
-	}
 }
 function attackBot(data) {
-	
-	const Bot = find_food(data.id); 
-
+	const Bot = find_food(data.id, this.room_id); 
 	if (!Bot) {
 		return;
 		console.log('no bot'); 
 	}
-	Bot.health -=10;
+	const room_id = this.room_id;
+	getLevel(data.login, room_id, data, 20, 50, Bot, this, damageBot);
+
+}
+async function getLevel(login, room_id, data, attack, exp, Player, self, fun)
+{
+	
+	const {_id, currectPerson} = await user_stat.findOne({login: login});
+	const personsUser = await personManager.find({user_id: _id});
+	const person = await personsCollection.findOne({title: currectPerson});
+	personsUser.forEach((personUser)=>{
+        if(person._id == personUser.person_id)
+        {
+
+            fun(room_id, data, personUser.level, attack, exp, Player, self);
+        }
+    });	
+}
+function damage(room_id, data, level, attack, exp, Player, self)
+{
+	Player.health -=level*10+attack;
+	if(Player.health <= 0)
+	{
+		self.killed++;
+		const player_lst = room_List[room_id].player_lst;
+		self.broadcast.to(room_id).emit('remove_player', {id: data.id});
+		self.broadcast.to(data.id).emit("killed", { killed: data.killed}); 
+		addExp(data.login, exp);
+		playerKilled(Player);
+		self.emit('remove_player', {id: data.id}); 
+		//player_lst.splice(player_lst.indexOf(Player), 1);
+		
+	}
+}
+function damageBot(room_id, data, level, attack, exp, Bot, self)
+{	
+	Bot.health -=level*10+attack;	
 	if(Bot.health <= 0)
 	{
-		this.broadcast.emit('remove_bot', {id: data.id});
+		self.killed++;
+		self.broadcast.emit('remove_bot', {id: data.id});
 		botKilled(Bot);
-		this.emit('remove_bot', {id: data.id}); 
+		self.emit('remove_bot', {id: data.id}); 
+		const bots_lst = room_List[room_id].bots_lst;
 		bots_lst.splice(bots_lst.indexOf(Bot), 1);
 		
 	}
 }
+async function addExp(login, value)
+{
+	const {_id, currectPerson} = await user_stat.findOne({login: login});
+	const personsUser = await personManager.find({user_id: _id});
+	const person = await personsCollection.findOne({title: currectPerson});
+	personsUser.forEach((personUser)=>{
+        if(person._id == personUser.person_id)
+        {
+			
+            if(personUser.limit < personUser.exp+value)
+			{
+				levelUp(personUser);
+			}
+			else 
+			{
+				expUp(personUser, value);
+			}
+        }
+    });
+}
+async function levelUp(personUser)
+{
+	await personManager.update({user_id : personUser.user_id, person_id : personUser.person_id}, {$set: {level : personUser.level+1,exp:0,  limit: personUser.limit*2 }});
+}
+async function expUp(personUser, value)
+{
+	await personManager.update({user_id : personUser.user_id, person_id : personUser.person_id}, {$set: {exp : personUser.exp+value}});
+}
+
 function crossBot(data) {
-	
-	const Bot = find_food(data.id_bot); 
+	if(this.room_id === undefined)
+	{
+		return;
+	}
+	const Bot = find_food(data.id_bot, this.room_id); 
 	const Player = find_playerid(this.room_id, this.id); 
 	if (!Bot) {
 		return;
@@ -306,10 +344,10 @@ function crossBot(data) {
 		return;
 		console.log('no player'); 
 	}
-	Player.health -=50;
+	Player.health -=10;
 	if(Player.health <= 0)
 	{
-		this.emit("killed");
+		this.emit("killed", { killed: this.killed});
 		//provide the new size the enemy will become
 		this.broadcast.emit('remove_player', {id: this.id});
 		playerKilled(Player);
@@ -324,13 +362,14 @@ function botKilled (bot) {
 //instead of listening to player positions, we listen to user inputs 
 let allow = false;
 function onMoveBot(data) {
-	const moveBot = find_food(data.id);
-	moveBot.x = data.x;  
-	moveBot.y = data.y;  
+	//const moveBot = find_food(data.id, this.room_id);
+	//moveBot.x = data.x;  
+	//moveBot.y = data.y;  
 }
-function onBullet()
+function onBullet(time)
 {
-
+	this.emit("myBullet", this.id);
+	this.broadcast.to(this.room_id).emit('enemyBullet', {id: this.id, time: time});
 }
 function onSword(time)
 {
@@ -338,7 +377,7 @@ function onSword(time)
 	this.broadcast.to(this.room_id).emit('enemySword', {id: this.id, time: time});
 }
 function onInputFired (data) {
-	if(this.room_id !== undefined)
+	if(this.room_id !== undefined && this.id !== undefined)
 	{
 	const movePlayer = find_playerid(this.room_id, this.id);
 	
@@ -397,7 +436,8 @@ function onInputFired (data) {
 
 	//send to sender (not to every clients). 
 	this.emit('input_recieved', info);
-	
+	movePlayer.x =serverPointer.world_x-14;
+	movePlayer.y =serverPointer.world_y-20;
 	//data to be sent back to everyone except sender 
 	const moveplayerData = {
 		id: movePlayer.id, 
@@ -455,7 +495,7 @@ function playerKilled (player) {
 //call when a client disconnects and tell the clients except sender to remove the disconnected player
 function onClientdisconnect() {
 	console.log('disconnect'); 
-	if(this.room_id !== undefined){
+	if(this.room_id !== undefined && room_List[this.room_id] !== undefined){
 		const removePlayer = find_playerid(this.room_id, this.id); 
 		const player_lst = room_List[this.room_id].player_lst;
 		if (removePlayer) {
@@ -474,9 +514,26 @@ function onClientdisconnect() {
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
+function onExit()
+{
+	if(this.room_id !== undefined && room_List[this.room_id] !== undefined){
+		const removePlayer = find_playerid(this.room_id, this.id); 
+		const player_lst = room_List[this.room_id].player_lst;
+		if (removePlayer) {
+			player_lst.splice(player_lst.indexOf(removePlayer), 1);
+		}
 
+		console.log("removing player " + this.id);
+		if (player_lst.length <= 0) {
+			delete room_List[this.room_id];
+		}
+		//send message to every connected client except the sender
+		this.broadcast.to(this.room_id).emit('remove_player', {id: this.id});
+	}
+}
 // find player by the the unique socket id 
 function find_playerid(room_id, id) {
+	if(room_List[room_id] === undefined) return;
 	const player_lst = room_List[room_id].player_lst;
 	for (let i = 0; i < player_lst.length; i++) {
 
@@ -511,6 +568,7 @@ io.sockets.on('connection', function(socket){
 	socket.on("cross_bot", crossBot);
 	socket.on("fire", onBullet);
 	socket.on("sword", onSword);
+	socket.on("exit", onExit);
 
 	socket.on("player_collision", onPlayerCollision);
 });

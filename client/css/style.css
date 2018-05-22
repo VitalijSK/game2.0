@@ -327,6 +327,27 @@ form button{
   -o-transition: opacity 0.3s 0.1s ease;
   -webkit-transition: opacity 0.3s 0.1s ease;
 }
+.gameover{
+  display:none;
+  background-image: url(../img/gameover.jpg);
+  background-size: cover;
+  width: 800px;
+  height: 600px;
+  border: 20px solid #000;
+  border-radius: 20px;
+  left: 0;
+  margin: 0 auto;
+  top: 50px;
+  right: 0;
+  position: absolute;
+  z-index: 1;
+  -moz-transition: opacity 0.3s 0.1s ease;
+  -o-transition: opacity 0.3s 0.1s ease;
+  -webkit-transition: opacity 0.3s 0.1s ease;
+}
+.gameover .button {
+  width: 251px;
+}
 .shop_menu{
   display:none;
   background-image: url(../img/levels.jpg);
@@ -344,6 +365,24 @@ form button{
   -o-transition: opacity 0.3s 0.1s ease;
   -webkit-transition: opacity 0.3s 0.1s ease;
 }
+.top_list{
+  display:none;
+  background-image: url(../img/top.jpg);
+  width: 800px;
+  height: 600px;
+  border: 20px solid #000;
+  border-radius: 20px;
+  left: 0;
+  margin: 0 auto;
+  top: 50px;
+  right: 0;
+  position: absolute;
+  z-index: 1;
+  -moz-transition: opacity 0.3s 0.1s ease;
+  -o-transition: opacity 0.3s 0.1s ease;
+  -webkit-transition: opacity 0.3s 0.1s ease;
+}
+
 .menu_pause{
   display:none;
   width: 800px;
@@ -377,7 +416,7 @@ form button{
   width: 293px;
 }
 .back_menu{
-  top: 19px;
+  top: 83px;
 }
 .level1, .level2, .level3{
   width: 223px;
@@ -426,6 +465,10 @@ form button{
   padding: 14px;
   height: 120px;
 }
+.macr{
+width:347px;
+margin:0 auto;
+}
 .level1{
   background-image: url(../img/levels/level1.jpg);
   margin-right:20px;
@@ -450,6 +493,14 @@ form button{
   margin: 0 auto;
   width: 169px;
   z-index: 1;
+  float:left;
+  position: static;
+}
+.menu .top {
+  margin: 0 auto;
+  width: 169px;
+  z-index: 1;
+  float:left;
   position: static;
 }
 .menu .border-animation__inner {
@@ -458,6 +509,15 @@ form button{
 .shop .border-animation__inner {
   width: 84%;
 }
+.top .border-animation__inner {
+  width: 84%;
+}
+.back_menu_shop{
+  top:400px;
+}
+.back_menu_top{
+  top:400px;
+}
 @media (min-width: 1200px)
 {
   .menu .border-animation {
@@ -465,6 +525,10 @@ form button{
     line-height: 1em;
 }
   .shop .border-animation {
+    font-size: 33pt;
+    line-height: 1em;
+}
+  .top .border-animation {
     font-size: 33pt;
     line-height: 1em;
 }
@@ -528,6 +592,9 @@ form button{
   margin-right: 0;
 }
 .menu .shop {
+  width: 126px;
+}
+.menu .top {
   width: 126px;
 }
 .menu .border-animation {

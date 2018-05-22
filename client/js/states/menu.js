@@ -24,5 +24,9 @@ class Menu{
             document.getElementsByClassName('menu')[0].style = 'display:none';
             self.game.state.start('shop', false, false);
         });
+        document.getElementsByClassName('top')[0].addEventListener('click', ()=>{
+            document.getElementsByClassName('menu')[0].style = 'display:none';
+            self.game.state.start('top', false, false);
+        });
     }
 }

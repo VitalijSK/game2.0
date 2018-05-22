@@ -3,7 +3,6 @@ const config = require('../config/index');
 module.exports = async (req, res, next)=>{
     const token = req.headers['authorization'];
     const good = req.headers['good'];
-    
     if(!token){
         return next({
             status: 403,
@@ -20,7 +19,6 @@ module.exports = async (req, res, next)=>{
             message
         });
     }
-
     req.token = tokenObj;
     req.good = good;
     next();

@@ -5,13 +5,11 @@ class GameOver{
     }
     create()
     {
-        LoadingText = game.add.text(game.world.width / 2, game.world.height / 2, "GameOver", {
-            font: '32px "Press Start 2P"',
-            fill: '#FFFFFF',
-            stroke: '#000000',
-            strokeThickness: 3,
-            align: 'center'
+        document.getElementsByClassName('gameover')[0].style = 'display:block';
+        
+        document.getElementsByClassName('back_menu')[1].addEventListener('click', ()=>{
+            document.getElementsByClassName('gameover')[0].style = 'display:none';
+            game.state.start('menu', false, false);
         });
-        LoadingText.anchor.setTo(0.5, 0.5);
     }
 }

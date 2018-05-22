@@ -6,7 +6,7 @@ class Level1{
     }
     create () {
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
+        bots = [];
         this.game.stage.backgroundColor = '#000000';
     
         bg = this.game.add.tileSprite(0, 0, canvas_width, canvas_height, 'background_level1');
@@ -29,16 +29,15 @@ class Level1{
         //socket.on("connect", onsocketConnected); 
         if(socket.connect)
         {
-            onsocketConnected();
+            onsocketConnected(1);
         }
 		//listen to new enemy connections
-		socket.on("new_enemyPlayer", onNewPlayer);
+		//socket.on("new_enemyPlayer", onNewPlayer);
 		socket.on("new_Bot", onNewBot);
 		//listen to enemy movement 
-		socket.on("enemy_move", onEnemyMove);
-		socket.on("bot_move", onBotMove);
+		//socket.on("enemy_move", onEnemyMove);
 		//when received remove_player, remove the player passed; 
-		socket.on('remove_player', onRemovePlayer); 
+		//socket.on('remove_player', onRemovePlayer); 
 		socket.on('remove_bot', onRemoveBot); 
 		//when the player receives the new input
         socket.on('input_recieved', onInputRecieved);
@@ -94,14 +93,10 @@ class Level1{
         for (let i = 0; i < bots.length; i++) {
             this.game.physics.arcade.collide(bots[i].player, layer);
             bots[i].player.body.collideWorldBounds = true; 
-            socket.emit('move_bot', {
-                id: bots[i].id,
-                x: bots[i].player.position.x, 
-                y: bots[i].player.position.y,
-            });
-            if (checkOverlap(player, bots[i].player) || bots[i].attack)
+            walkBot(bots[i]);
+            if (checkOverlap(player, bots[i].player))
             {
-                attackBot(bots[i]);
+               attackBot(bots[i]);
             }
         }
         setCollisionAttack();

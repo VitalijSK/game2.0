@@ -21,7 +21,7 @@ module.exports.findAll = async function() {
 module.exports.find = async function(condit) {
     let person;
     try{    
-       
+        
         person = await Persons.findOne(condit, {'price':true});
     }catch(e)
     {

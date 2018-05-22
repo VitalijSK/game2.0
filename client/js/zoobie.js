@@ -3,6 +3,7 @@ class Zoobies{
         this.x = startx;
         this.y = starty;
         this.id = id;
+        this.prevX = this.x;
         this.player = game.add.sprite(42, 51, 'zoombie');
         game.physics.arcade.enable(this.player);
         game.physics.enable(this.player, Phaser.Physics.ARCADE);
@@ -11,6 +12,7 @@ class Zoobies{
         this.player.body.collideWorldBounds = true;
         this.player.body.setSize(20, 32, 5, 16);
         this.player.body.gravity.y = 300;
+        this.player.body.velocity.x = 50;
      
         this.player.position.x = startx; 
         this.player.position.y = starty; 

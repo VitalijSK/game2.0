@@ -133,6 +133,7 @@ window.onload = ()=>{
         const preload = new Preload(game);
         const menu = new Menu(game);
         const shop = new Shop(game);
+        const top = new Top(game);
         const level1 = new Level1(game);
         const level2 = new Level2(game);
         const level3 = new Level3(game);
@@ -143,6 +144,7 @@ window.onload = ()=>{
                 game.state.add('preload', preload);
                 game.state.add('menu', menu);
                 game.state.add('shop', shop);
+                game.state.add('top', top);
                 game.state.add('level1', level1);
                 game.state.add('level2', level2);
                 game.state.add('level3', level3);

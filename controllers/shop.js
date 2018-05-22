@@ -3,7 +3,6 @@ const Persons = require('../services/Persons');
 const PersonsUser = require('../services/PersonsUser');
 
 module.exports.buy = async function(req, res, next){
-    
     const {token, good} = req;
     let {_id, coins} = await UserService.getUserByToken(token);
     let change = false;
@@ -19,7 +18,9 @@ module.exports.buy = async function(req, res, next){
     let answer = {message: '', coins: coins};
     try{
         if(!change)
-            answer = await UserService.setUserByToken(token, person.price,person. _id);
+        {
+            answer = await UserService.setUserByToken(token, person.price, person._id);
+        }    
          if(answer.message === '')
          {
             answer = await UserService.changeSkin(token, good);
