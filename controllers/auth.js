@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const Person = require('../models/persons');
+const PersonUser = require('../models/personsuser');
 const jwt = require('jsonwebtoken');
 const config = require('../config/index');
 
@@ -8,6 +9,8 @@ module.exports.signup = async (req, res, next)=>{
     let user;
     try{
         user = await  User.create(credentials);
+        const person = await Person.findOne({title: user.currectPerson});
+        await PersonUser.insertMany([{user_id: user._id, person_id: person._id, level: 0}]);
     }catch({message}){
         return next({
             status:400,

@@ -288,6 +288,7 @@ function damage(room_id, data, level, attack, exp, Player, self)
 }
 function damageBot(room_id, data, level, attack, exp, Bot, self)
 {	
+	console.log(Bot.health);
 	Bot.health -=level*10+attack;	
 	if(Bot.health <= 0)
 	{

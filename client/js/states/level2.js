@@ -59,13 +59,17 @@ class Level2{
         attack.onDown.add(attackHeroy, this);
         pause.onDown.add(onPause, this);
         fullscreen.onDown.add(onFullScreen, this);
-        shoot.onDown.add(shootHerou, this);
-        slide.onDown.add(slideHerou, this);
-        this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR));
-        this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.SHIFT));
-        this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.F12));
-        this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.X));
-        this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.Z));
+        if ( skin === 'robot' ) {
+            shoot.onDown.add(shootHerou, this);
+            slide.onDown.add(slideHerou, this);
+       }
+       this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR));
+       this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.SHIFT));
+       this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.F12));
+       if ( skin === 'robot' ) {
+           this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.X));
+           this.game.input.keyboard.removeKeyCapture(this.game.input.keyboard.addKey(Phaser.Keyboard.Z));
+       }
 
         weapon = this.game.add.weapon(20, 'bullet');
         //  The bullet will be automatically killed when it leaves the world bounds

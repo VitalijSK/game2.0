@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     password: String,
     coins: { 
         type: Number,
-        default: 6000 
+        default: 0 
         },
     currectPerson:{ 
         type: String,

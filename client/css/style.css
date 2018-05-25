@@ -416,6 +416,9 @@ form button{
   width: 293px;
 }
 .back_menu{
+  top: 24px;
+}
+.gameover .back_menu{
   top: 83px;
 }
 .level1, .level2, .level3{
@@ -535,7 +538,21 @@ margin:0 auto;
 }
 @media (max-width: 800px)
 {
+  .back_menu_shop{
+    top:531px;
+  }
   .fon{
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    top: 0px;
+    border: none;
+  }
+  .menu .shop{
+
+    float:none;
+  }
+  .top_list{
     width: 100vw;
     height: 100vh;
     background-size: cover;

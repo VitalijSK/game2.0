@@ -42,7 +42,6 @@ module.exports.collection = async function(req, res, next){
         const {_id, currectPerson} = await UserService.getUserByToken(token);
         const personsUser = await PersonsUser.find({user_id: _id});
         persons = await Persons.findAll();
-      
         persons.forEach((person)=>{
             if(currectPerson == person.title)
             {

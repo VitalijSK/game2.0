@@ -14,10 +14,12 @@ btnArr.forEach(function(btn){
     });
 });
 document.getElementById('singup').addEventListener('click', function(){
+    document.getElementById('auth').style="lefT: 100vw;opacity:1;";
     document.getElementById('registr').style="lefT: calc( 50vw - 200px );opacity:1;";
     section.classList.add('formmod');
 });
 document.getElementById('singin').addEventListener('click', function(){
+    document.getElementById('registr').style="lefT: -400px;opacity:1;";
     document.getElementById('auth').style="right: calc( 50vw - 200px );opacity:1;";
     section.classList.add('formmod');
 });
